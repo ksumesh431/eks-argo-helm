@@ -1,3 +1,80 @@
+
+################################################################################
+# argocd helm deployment
+################################################################################
+
+data "aws_eks_cluster_auth" "cluster" {
+  name       = module.eks.cluster_name
+  depends_on = [module.eks]
+}
+data "aws_eks_cluster" "cluster" {
+  name       = module.eks.cluster_name
+  depends_on = [module.eks]
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = data.aws_eks_cluster.cluster.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+    token                  = data.aws_eks_cluster_auth.cluster.token
+  }
+}
+
+
+
+module "argo_application" {
+  # source = "lablabs/eks-argocd/aws"
+  source = "./modules/eks-argocd-helm"
+
+  cluster_identity_oidc_issuer     = module.eks.oidc_provider
+  cluster_identity_oidc_issuer_arn = module.eks.oidc_provider_arn
+
+  enabled           = true
+  argo_enabled      = false
+  argo_helm_enabled = true
+
+  self_managed = false
+
+  helm_release_name = "argocd-helm"
+  namespace         = "argocd-helm"
+
+  argo_namespace = "default"
+  argo_sync_policy = {
+    "automated" : {}
+    "syncOptions" = ["CreateNamespace=true"]
+  }
+}
+
+################################################################################
+# argocd helm deployment
+################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 provider "aws" {
   region = local.region
 }
@@ -519,53 +596,4 @@ resource "aws_autoscaling_group_tag" "cluster_autoscaler_label_tags" {
 }
 
 
-
-
-################################################################################
-# argocd helm deployment
-################################################################################
-
-
-
-data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_name
-  depends_on = [ module.eks ]
-}
-data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_name
-  depends_on = [ module.eks ]
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = data.aws_eks_cluster.cluster.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
-    token                  = data.aws_eks_cluster_auth.cluster.token
-  }
-}
-
-
-
-module "argo_application" {
-  # source = "lablabs/eks-argocd/aws"
-  source = "./modules/eks-argocd-helm"
-
-  cluster_identity_oidc_issuer     = module.eks.oidc_provider
-  cluster_identity_oidc_issuer_arn = module.eks.oidc_provider_arn
-
-  enabled           = true
-  argo_enabled      = false
-  argo_helm_enabled = true
-
-  self_managed = false
-
-  helm_release_name = "argocd-helm"
-  namespace         = "argocd-helm"
-
-  argo_namespace = "default"
-  argo_sync_policy = {
-    "automated" : {}
-    "syncOptions" = ["CreateNamespace=true"]
-  }
-}
 
