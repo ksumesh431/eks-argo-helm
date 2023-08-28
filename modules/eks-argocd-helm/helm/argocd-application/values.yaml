@@ -1,2 +1,7 @@
 nameOverride: ""
 fullnameOverride: ""
+# server.service.type: "LoadBalancer"
+server:
+  # -- Argo CD server name
+  service: 
+    type: "LoadBalancer"
