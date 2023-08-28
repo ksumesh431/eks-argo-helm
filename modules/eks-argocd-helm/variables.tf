@@ -1,9 +1,3 @@
-variable "enabled" {
-  type        = bool
-  default     = true
-  description = "Variable indicating whether deployment is enabled"
-}
-
 variable "cluster_identity_oidc_issuer" {
   type        = string
   description = "The OIDC Identity issuer for the cluster"
@@ -24,7 +18,7 @@ variable "helm_chart_name" {
 
 variable "helm_chart_version" {
   type        = string
-  default     = "4.10.8"
+  default     = "5.45.0"
   description = "Version of the Helm chart"
 }
 
@@ -63,11 +57,6 @@ variable "values" {
   description = "Additional yaml encoded values which will be passed to the Helm chart, see https://artifacthub.io/packages/helm/argo/argo-cd?modal=values"
 }
 
-variable "self_managed" {
-  type        = bool
-  default     = true
-  description = "If set to true, the module will create ArgoCD Application manifest in the cluster and abandon the Helm release"
-}
 
 # ================ IRSA variables (optional) ================
 
@@ -151,18 +140,6 @@ variable "argo_namespace" {
   description = "Namespace to deploy ArgoCD application CRD to"
 }
 
-variable "argo_enabled" {
-  type        = bool
-  default     = false
-  description = "If set to true, the module will be deployed as ArgoCD application, otherwise it will be deployed as a Helm release"
-}
-
-variable "argo_helm_enabled" {
-  type        = bool
-  default     = false
-  description = "If set to true, the ArgoCD Application manifest will be deployed using Kubernetes provider as a Helm release. Otherwise it'll be deployed as a Kubernetes manifest. See Readme for more info"
-}
-
 variable "argo_destination_server" {
   type        = string
   default     = "https://kubernetes.default.svc"
@@ -235,31 +212,6 @@ variable "argo_helm_values" {
   description = "Value overrides to use when deploying argo application object with helm"
 }
 
-# ================ argo kubernetes manifest variables (required) ================
-
-variable "argo_kubernetes_manifest_computed_fields" {
-  type        = list(string)
-  default     = ["metadata.labels", "metadata.annotations", "metadata.finalizers"]
-  description = "List of paths of fields to be handled as \"computed\". The user-configured value for the field will be overridden by any different value returned by the API after apply."
-}
-
-variable "argo_kubernetes_manifest_field_manager_name" {
-  type        = string
-  default     = "Terraform"
-  description = "The name of the field manager to use when applying the kubernetes manifest resource. Defaults to Terraform"
-}
-
-variable "argo_kubernetes_manifest_field_manager_force_conflicts" {
-  type        = bool
-  default     = false
-  description = "Forcibly override any field manager conflicts when applying the kubernetes manifest resource"
-}
-
-variable "argo_kubernetes_manifest_wait_fields" {
-  type        = map(string)
-  default     = {}
-  description = "A map of fields and a corresponding regular expression with a pattern to wait for. The provider will wait until the field matches the regular expression. Use * for any value."
-}
 
 # ================ helm release variables (required) ================
 
@@ -337,7 +289,7 @@ variable "helm_reuse_values" {
 
 variable "helm_force_update" {
   type        = bool
-  default     = false
+  default     = true
   description = "Force helm resource update through delete/recreate if needed"
 }
 

@@ -26,6 +26,10 @@ locals {
           "eks.amazonaws.com/role-arn" : local.irsa_role_create ? aws_iam_role.this[0].arn : ""
         }
       }
+      "service" : {
+        "type" : "LoadBalancer"
+      }
+
     }
     "dex" : {
       "serviceAccount" : {
@@ -49,7 +53,7 @@ locals {
 }
 
 data "utils_deep_merge_yaml" "values" {
-  count = var.enabled ? 1 : 0
+  count = 1
   input = compact([
     local.values,
     var.values
